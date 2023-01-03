@@ -6,8 +6,10 @@ const loginUser = async (req, res) => {
             email: req.body.email,
             password: req.body.password,
         });
-        if (result.length > 0) {
-            res.send('Login successful');
+        if (result) {
+            res.send(result);
+        } else {
+            res.status(400).json('Login failed');
         }
     } catch (error) {
         res.status(400).json('Login failed');
