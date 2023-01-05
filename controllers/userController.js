@@ -1,6 +1,7 @@
 const { User } = require('../models/userModel');
 const jwt = require('jsonwebtoken'); // to generate signed token
 var { expressjwt } = require('express-jwt'); // for authorization check
+
 const loginUser = async (req, res) => {
     // find the user based on email
     const { email, password } = req.body;
@@ -43,7 +44,7 @@ const registerUser = async (req, res) => {
                 });
             }
             // user.salt = undefined;
-            // user.hashed_password = undefined;
+            user.password = undefined;
 
             res.json({
                 user,
