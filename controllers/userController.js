@@ -21,6 +21,7 @@ const loginUser = async (req, res) => {
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
     // persist the token as 't' in cookie with expiry date
     res.cookie('token', token, { expire: new Date() + 9999 });
+    res.password = undefined;
     return res.json({ token, user });
 };
 
@@ -75,16 +76,27 @@ const getUserDetails = async (req, res, next) => {
     });
 };
 
-(exports.requireSignin = expressjwt({ secret: process.env.JWT_SECRET, algorithms: ['HS256'] })),
-    (exports.isAuth = (req, res, next) => {
-        let user = req.profile && req.auth && req.profile._id == req.auth._id;
-        if (!user) {
-            return res.status(403).json({
-                error: 'Access denied',
-            });
-        }
-        next();
-    });
+const updateProfile = async (req, res) => {
+    try {
+        await User.findOneAndUpdate({ _id: req.body._id }, req.body);
+        const user = await User.findOne({ _id: req.body._id });
+        res.send(user);
+    } catch (error) {
+        res.status(400).json(error);
+    }
+};
+
+exports.requireSignin = expressjwt({ secret: process.env.JWT_SECRET, algorithms: ['HS256'] });
+
+exports.isAuth = (req, res, next) => {
+    let user = req.profile && req.auth && req.profile._id == req.auth._id;
+    if (!user) {
+        return res.status(403).json({
+            error: 'Access denied',
+        });
+    }
+    next();
+};
 
 exports.isAdmin = (req, res, next) => {
     if (req.profile.role === 'user') {
@@ -95,4 +107,4 @@ exports.isAdmin = (req, res, next) => {
     next();
 };
 
-module.exports = { loginUser, registerUser, logOut, getUserDetails };
+module.exports = { loginUser, registerUser, logOut, getUserDetails, updateProfile };

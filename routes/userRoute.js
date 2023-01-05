@@ -4,8 +4,9 @@ const {
     registerUser,
     logOut,
     getUserDetails,
+    updateProfile,
 } = require('../controllers/userController');
-const { isAuthenticatedUser, verifyToken } = require('../helpers/auth');
+const { isAuthenticatedUser } = require('../helpers/auth');
 const { userSignupValidator } = require('../validators');
 
 const router = express.Router();
@@ -13,6 +14,7 @@ const router = express.Router();
 router.route('/login').post(loginUser);
 router.route('/logout').get(logOut);
 router.route('/register').post(userSignupValidator, registerUser);
-router.route('/user-details').get(verifyToken, getUserDetails);
+router.route('/user-details').get(isAuthenticatedUser, getUserDetails);
+router.route('/update-profile').post(isAuthenticatedUser, updateProfile);
 
 module.exports = router;
